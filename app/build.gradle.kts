@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.kapt") version "1.9.20"
 }
 
 android {
@@ -15,6 +16,23 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    //Kapt scehma directory path when created
+    kapt {
+        arguments {
+            arg("room.schemaLocation", "$projectDir/schemas")
+        }
+    }
+
+    // Ensure schema directory creation if doesn't exist
+    tasks.register("createSchemaDir") {
+        doLast {
+            val schemaDir = File("$projectDir/schemas")
+            if (!schemaDir.exists()) {
+                schemaDir.mkdirs()
+            }
+        }
     }
 
     buildTypes {
@@ -37,12 +55,27 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.10.1")
-    
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.9.0")
+    val roomVersion = "2.6.0"
+
+    implementation("androidx.room:room-runtime:$roomVersion")
+    annotationProcessor("androidx.room:room-compiler:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+    kapt("androidx.room:room-compiler:$roomVersion")
+    androidTestImplementation("androidx.room:room-testing:$roomVersion")
+
+    val lifecycleVersion = "2.6.2"
+
+    implementation("com.github.bumptech.glide:glide:4.12.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
+    implementation("androidx.fragment:fragment-ktx:1.6.2") // for Fragment
+    implementation("androidx.activity:activity-ktx:1.8.1")
+    implementation ("de.hdodenhof:circleimageview:3.1.0")
+
+    // app compact
+    implementation ("androidx.appcompat:appcompat:1.6.1")
+
+    // Constraint layout
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
 }
